@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>WP-Ductus</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Learn calligraphy in 14 styles, from copperplate to Fraktur: trace or copy letters and whole texts in a notebook, marked by a small network whose weights were written by hand.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WP-Ductus">
+<meta property="og:title" content="WP-Ductus">
+<meta property="og:description" content="Learn calligraphy in 14 styles, from copperplate to Fraktur: trace or copy letters and whole texts in a notebook, marked by a small network whose weights were written by hand.">
+<meta property="og:url" content="https://heldernoid.github.io/WP-Ductus/">
+<meta property="og:image" content="https://heldernoid.github.io/WP-Ductus/apple-touch-icon.png">
+<meta property="og:image:width" content="180">
+<meta property="og:image:height" content="180">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WP-Ductus">
+<meta name="twitter:description" content="Learn calligraphy in 14 styles, from copperplate to Fraktur: trace or copy letters and whole texts in a notebook, marked by a small network whose weights were written by hand.">
+<meta name="twitter:image" content="https://heldernoid.github.io/WP-Ductus/apple-touch-icon.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a writing desk. A slim masthead with the four views; on Practice, the controls as one strip, then the
+   notebook as the hero with its marks at its side, then the report for the whole text. The desk is a cool blotter
+   grey-green so the cream pages stand out; iron-gall violet is the one accent. */
+:root {
+  --desk: #e3e7e0;          /* blotter */
+  --desk-2: #d6dbd3;        /* blotter, deeper: wells and tabs */
+  --panel: #f4f5f1;         /* cards on the desk */
+  --paper: #fffcf4;         /* notebook paper */
+  --paper-edge: #efe9da;    /* the pages under the page */
+  --ink: #1d1a2b;           /* text and the pen's ink */
+  --muted: #5b5867;
+  --rule: #c9cec4;          /* borders on the desk */
+  --guide: #bfcbe3;         /* ruling on the paper */
+  --guide-strong: #7f96c8;  /* baseline and x-height */
+  --margin-line: #df8b86;   /* the notebook's margin */
+  --dots: #c4baa8;          /* the dotted model */
+  --ghost: #d8cebd;         /* the model shown faintly beside a copy */
+  --accent: #3d3486;        /* iron-gall violet */
+  --accent-ink: #fffcf4;    /* text on the accent */
+  --accent-soft: #e4e1f2;
+  --star: #a8730a;
+  --good: #2e7a4f; --fair: #a8730a; --poor: #c0443a;
+  --off: #d2463a; --miss: #e09a1a; --back: #8b4fd6; --press: #2f7fd8;
+  --shadow: rgba(40, 44, 36, .16);
+  --f-display: "IM Fell English", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --f-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --s-1: .8125rem; --s0: 1rem; --s1: 1.25rem; --s2: 1.7rem; --s3: 2.5rem;
+  --r: 14px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --desk: #111412; --desk-2: #191d1a; --panel: #171a18; --paper: #1d1e24; --paper-edge: #26272e;
+    --ink: #ece6d8; --muted: #a29fae; --rule: #2c312d; --guide: #303b56; --guide-strong: #51659a; --margin-line: #8c4a49;
+    --dots: #4b4757; --ghost: #3b3848; --accent: #ab9fff; --accent-ink: #15131f; --accent-soft: #262240; --star: #e6b247;
+    --good: #5fc48a; --fair: #e6b247; --poor: #ff7a6b; --off: #ff7a6b; --miss: #f2b443; --back: #b78bff; --press: #6fb0ff;
+    --shadow: rgba(0, 0, 0, .5); color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --desk: #111412; --desk-2: #191d1a; --panel: #171a18; --paper: #1d1e24; --paper-edge: #26272e;
+  --ink: #ece6d8; --muted: #a29fae; --rule: #2c312d; --guide: #303b56; --guide-strong: #51659a; --margin-line: #8c4a49;
+  --dots: #4b4757; --ghost: #3b3848; --accent: #ab9fff; --accent-ink: #15131f; --accent-soft: #262240; --star: #e6b247;
+  --good: #5fc48a; --fair: #e6b247; --poor: #ff7a6b; --off: #ff7a6b; --miss: #f2b443; --back: #b78bff; --press: #6fb0ff;
+  --shadow: rgba(0, 0, 0, .5); color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; }
+body {
+  background: var(--desk); color: var(--ink); font: 400 var(--s0)/1.55 var(--f-body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--desk); }
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; margin: 0; text-wrap: balance; line-height: 1.15; }
+h1 { font-size: var(--s3); }
+h1 em, h2 em { font-style: italic; }
+h2 { font-size: var(--s2); }
+h3 { font-size: var(--s1); }
+p { margin: 0; max-width: 66ch; }
+a { color: var(--accent); }
+code, .mono { font-family: var(--f-mono); font-size: .86em; }
+.muted { color: var(--muted); }
+button, input, textarea, select { font: inherit; color: inherit; }
+button { touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cap { font: 600 .72rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.spacer { flex: 1; }
+.hint { font-size: var(--s-1); color: var(--muted); min-height: 0; }
+.hint:empty { display: none; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--rule); background: var(--panel); border-radius: 999px;
+       padding: 8px 15px; cursor: pointer; font-weight: 700; font-size: var(--s-1); line-height: 1.2; color: var(--ink); text-decoration: none; }
+.btn:hover { border-color: var(--muted); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.small { padding: 5px 11px; }
+.btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.btn:disabled { opacity: .55; cursor: progress; }
+.btn.file { position: relative; overflow: hidden; }
+.btn.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 999px; background: var(--desk-2); }
+.seg button { border: 0; background: none; border-radius: 999px; padding: 8px 16px; cursor: pointer; font-weight: 700; font-size: var(--s-1); color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--panel); color: var(--accent); box-shadow: 0 1px 2px var(--shadow); }
+@media (pointer: coarse) {
+  .btn, .seg button { min-height: 44px; }
+  .key { min-width: 48px !important; height: 54px !important; }
+  .chip { min-height: 44px; min-width: 40px; }
+}
+
+/* masthead */
+.mast { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--desk); margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); padding-inline: max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--rule); }
+.mast-in { max-width: 1240px; margin: 0 auto; display: flex; align-items: center; gap: 18px; min-height: 58px; flex-wrap: wrap; padding-block: 6px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; }
+.brand svg { width: 26px; height: 26px; }
+.brand span { font: italic 400 1.55rem/1 var(--f-display); }
+.tabs { display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; flex: 1 1 auto; min-width: 0; }
+.tabs a { padding: 8px 12px; border-radius: 8px; color: var(--muted); text-decoration: none; font-weight: 700; font-size: var(--s-1); white-space: nowrap; }
+.tabs a:hover { color: var(--ink); }
+.tabs a[aria-current="page"] { color: var(--accent); background: var(--accent-soft); }
+.gh { margin-left: auto; }
+.gh svg { width: 16px; height: 16px; fill: currentColor; }
+@media (max-width: 640px) { .mast-in { gap: 6px 12px; } .tabs { order: 3; flex-basis: 100%; } }
+
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 22px; padding-top: 22px; }
+.view { display: grid; gap: 22px; min-width: 0; }
+.status { padding: 10px 14px; border-radius: 10px; background: var(--panel); border: 1px solid var(--rule); }
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r); padding: 18px; display: grid; gap: 14px; min-width: 0; }
+
+/* practice: intro and controls */
+.intro { display: grid; gap: 8px; }
+.intro p { color: var(--muted); }
+.controls { gap: 16px; }
+.ctrl-row { display: flex; gap: 10px 14px; align-items: center; flex-wrap: wrap; }
+.star-total { margin-left: auto; font: 600 var(--s-1)/1 var(--f-mono); color: var(--star); }
+.ptabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--rule); }
+.ptab { border: 0; background: none; padding: 8px 12px 9px; cursor: pointer; font-weight: 700; font-size: var(--s-1); color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+.ptab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.keys { display: flex; gap: 6px; flex-wrap: wrap; }
+.key { position: relative; min-width: 42px; height: 50px; padding: 0 6px 12px; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); cursor: pointer; }
+.key .glyph { font: italic 400 1.45rem/1 var(--f-display); }
+.key.first::after { content: ""; position: absolute; top: 5px; right: 5px; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: .55; }
+.key:hover { border-color: var(--muted); }
+.key[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.key .stars { position: absolute; left: 0; right: 0; bottom: 5px; font: 9px/1 var(--f-mono); color: var(--star); letter-spacing: 1px; text-align: center; }
+/* the hands */
+.hands { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+@media (min-width: 900px) { .hands { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.hand { display: grid; gap: 2px; justify-items: start; text-align: left; padding: 8px 10px 9px; border: 1px solid var(--rule); border-radius: 12px; background: var(--paper); cursor: pointer; min-width: 0; }
+.hand canvas { width: 100%; height: 44px; display: block; margin-bottom: 4px; }
+.hand b { font: 400 1.02rem/1.15 var(--f-display); }
+.hand span { font-size: .72rem; color: var(--muted); }
+.hand:hover { border-color: var(--muted); }
+.hand[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--accent-soft); }
+.variants { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.variants .label { font: 700 .72rem/1 var(--f-body); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-right: 4px; }
+.variant { border: 1px solid var(--rule); border-radius: 999px; background: var(--paper); cursor: pointer; padding: 6px 14px; font: 400 1rem/1.2 var(--f-display); min-height: 36px; }
+.variant[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.take { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: var(--s-1); color: var(--muted); }
+.phrases { display: flex; gap: 6px; flex-wrap: wrap; }
+.phrase { display: inline-flex; gap: 6px; align-items: baseline; border: 1px solid var(--rule); border-radius: 10px; background: var(--paper); cursor: pointer; padding: 6px 12px; font: italic 400 1.05rem/1.3 var(--f-display); text-align: left; max-width: 100%; }
+.phrase b { font: 700 .72rem/1 var(--f-body); font-style: normal; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.phrase .stars { font: 10px/1 var(--f-mono); color: var(--star); font-style: normal; }
+.phrase[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.text-form { display: grid; gap: 8px; }
+.text-form textarea { width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--rule); background: var(--paper); font: italic 400 1.1rem/1.45 var(--f-display); }
+
+/* the workspace: the notebook and its marks */
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 22px; align-items: start; scroll-margin-top: 80px; }
+body[data-mode="copy"][data-unit="text"] .workspace { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 980px) { .workspace { grid-template-columns: minmax(0, 1fr); } }
+.notebook { display: grid; gap: 12px; min-width: 0; background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 18px 0; }
+.nb-head { display: flex; gap: 10px 16px; align-items: center; flex-wrap: wrap; }
+.nb-head h2 { font-size: var(--s1); flex: 1 1 16em; min-width: 0; }
+.nb-head h2 .t { font-style: italic; overflow-wrap: anywhere; }
+.size-row button { padding: 6px 14px; font-size: var(--s0); color: var(--ink); }
+.size-row button:disabled { opacity: 0.35; cursor: default; }
+.pager { display: inline-flex; align-items: center; gap: 6px; font: 600 var(--s-1)/1 var(--f-mono); }
+.pager button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--rule); background: var(--paper); cursor: pointer; font-size: 1.1rem; }
+.pager button:disabled { opacity: .4; cursor: default; }
+.sheets { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+body[data-mode="copy"] .sheets { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+body[data-mode="copy"][data-unit="letter"] .sheets { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+body[data-unit="letter"]:not([data-mode="copy"]) .sheets { max-width: 680px; width: 100%; justify-self: center; }
+@media (max-width: 720px) { body[data-mode="copy"] .sheets { grid-template-columns: minmax(0, 1fr) !important; } body[data-mode="copy"][data-unit="letter"] #model-sheet { max-width: 260px; } }
+.sheet { margin: 0; display: grid; gap: 6px; min-width: 0; align-content: start; }
+body:not([data-mode="copy"]) .sheet .cap { display: none; }
+/* a page of the notebook: paper on two more pages, slightly offset */
+.paper { position: relative; width: 100%; max-width: 100%; aspect-ratio: 1; border-radius: 4px; background: var(--paper);
+         box-shadow: 0 1px 2px var(--shadow), 3px 3px 0 -1px var(--paper-edge), 3px 3px 0 0 var(--rule), 6px 6px 0 -1px var(--paper-edge), 6px 6px 0 0 var(--rule); }
+.paper canvas { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 4px; }
+.pad { touch-action: none; cursor: crosshair; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.legend { display: flex; gap: 6px 14px; flex-wrap: wrap; font-size: var(--s-1); color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+.toolbar { position: sticky; bottom: 0; z-index: 2; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+           margin: 0 -18px; padding: 10px 18px calc(10px + env(safe-area-inset-bottom, 0px));
+           background: var(--panel); border-top: 1px solid var(--rule); border-radius: 0 0 var(--r) var(--r); }
+.input-mode { font-size: var(--s-1); color: var(--muted); flex: 1 1 12em; min-width: 0; }
+.mini-score { font: 700 1rem/1 var(--f-body); color: var(--accent); font-variant-numeric: tabular-nums; }
+.mini-score .st { color: var(--star); margin-left: 6px; font-size: .8rem; letter-spacing: 1px; }
+
+/* marks beside the notebook */
+.marks { display: grid; gap: 14px; align-content: start; background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r); padding: 18px; min-width: 0; scroll-margin-top: 80px; }
+.marks > div { display: grid; gap: 14px; }
+.eyebrow { font: 600 .72rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.score { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.big { font: 700 3.6rem/.9 var(--f-body); letter-spacing: -.02em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.bigstars { font-size: 1.6rem; letter-spacing: 2px; }
+.on { color: var(--star); } .off { color: var(--rule); }
+.bars { display: grid; gap: 9px; }
+.bar, .fbar { display: grid; grid-template-columns: 5.4em minmax(0, 1fr) 2.4em; gap: 10px; align-items: center; font-size: var(--s-1); }
+.bar .name, .fbar .name { font-weight: 700; }
+.track { height: 9px; border-radius: 999px; background: var(--accent-soft); overflow: hidden; display: block; }
+.fill { display: block; height: 100%; border-radius: 999px; background: var(--accent); transition: width .35s ease; }
+.val { text-align: right; font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+.bar.na .val, .bar.na .name { color: var(--muted); }
+.tip { padding: 10px 12px; border-radius: 10px; background: var(--accent-soft); font-size: .98rem; }
+.per { display: flex; flex-wrap: wrap; gap: 10px 12px; }
+.per .word { display: inline-flex; gap: 3px; }
+.chip { border: 1px solid var(--rule); background: var(--paper); border-radius: 8px; padding: 4px 6px 3px; cursor: pointer; display: grid; justify-items: center; gap: 1px; min-width: 32px; }
+.chip b { font: italic 400 1.15rem/1 var(--f-display); }
+.chip small { font: 600 10px/1 var(--f-mono); }
+.s3 small { color: var(--good); } .s2 small { color: var(--fair); } .s1 small, .s0 small { color: var(--poor); }
+.chip[aria-current="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+/* the report on the whole text */
+.text-report { display: grid; gap: 18px; }
+.tr-head { display: flex; gap: 12px 24px; align-items: end; flex-wrap: wrap; }
+.tr-head h2 { flex: 1 1 14em; }
+.tr-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+@media (min-width: 760px) { .tr-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 18px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.card h3 { font-size: var(--s1); }
+.words { display: flex; flex-wrap: wrap; gap: 6px; }
+.wchip { display: inline-flex; align-items: baseline; gap: 5px; padding: 4px 9px; border-radius: 8px; background: var(--paper); border: 1px solid var(--rule); font: italic 400 1.05rem/1.2 var(--f-display); border-left: 4px solid var(--c, var(--rule)); }
+.wchip small { font: 600 10px/1 var(--f-mono); font-style: normal; }
+.wchip.s3 { --c: var(--good); } .wchip.s2 { --c: var(--fair); } .wchip.s1, .wchip.s0 { --c: var(--poor); }
+.weak { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.weak li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.weak .g { font: italic 400 1.8rem/1 var(--f-display); text-align: center; }
+.weak .what { font-size: var(--s-1); color: var(--muted); }
+.weak .what b { color: var(--ink); font-family: var(--f-mono); }
+.weak .none { display: block; color: var(--muted); font-size: var(--s-1); }
+.fbar { grid-template-columns: 9.5em minmax(0, 1fr) 2.6em; }
+.fbar .fill { background: var(--poor); opacity: .8; }
+.fbar .ex { grid-column: 1 / -1; margin-top: -6px; font-size: .75rem; color: var(--muted); font-style: italic; }
+.fbar .ex:empty { display: none; }
+.steady { display: grid; gap: 8px; font-size: .95rem; }
+.steady .k { display: inline-block; min-width: 3.6em; font: 600 .72rem/1 var(--f-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.advice { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+
+/* focus: the notebook alone (full screen where the browser allows) */
+body.focus .mast, body.focus .intro, body.focus .controls, body.focus .text-report, body.focus footer { display: none; }
+body.focus .wrap { max-width: none; padding-top: 12px; }
+.lock { display: inline-flex; align-items: center; gap: 6px; }
+.lock svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; }
+.lock[aria-pressed="true"] svg rect { fill: currentColor; }
+/* locked: the page holds still under the hand (no scrolling, no zooming, no bounce); buttons still answer a tap */
+html.locked, html.locked body { overflow: hidden; overscroll-behavior: none; touch-action: none; }
+@media (min-width: 1100px) { body.focus .workspace { grid-template-columns: minmax(0, 1fr) 320px !important; } }
+
+/* the hand */
+.hand-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .hand-grid { grid-template-columns: minmax(0, 1fr); } }
+.facts { display: grid; gap: 12px; }
+.facts dl { margin: 0; display: grid; grid-template-columns: 8em minmax(0, 1fr); gap: 8px 14px; font-size: .95rem; }
+.facts dt { font-weight: 700; }
+.facts dd { margin: 0; }
+.anatomy { width: 100%; max-width: 100%; aspect-ratio: 288 / 112; border-radius: 4px; display: block; box-shadow: 0 1px 2px var(--shadow); }
+.specimen { width: 100%; max-width: 100%; display: block; border-radius: 4px; cursor: pointer; box-shadow: 0 1px 2px var(--shadow); }
+.strokes { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
+.stroke-card { margin: 0; border: 1px solid var(--rule); border-radius: 10px; padding: 10px; display: grid; gap: 6px; background: var(--paper); }
+.stroke-card canvas { width: 100%; aspect-ratio: 3 / 2; display: block; }
+.stroke-card.whole b { font: 400 1.4rem/1 var(--f-display); }
+.stroke-card figcaption { display: grid; gap: 2px; }
+.stroke-card b { font-size: .95rem; }
+.stroke-card span { font-size: var(--s-1); color: var(--muted); line-height: 1.4; }
+.list { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; max-width: 72ch; }
+
+/* inside the network */
+.maps { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.maps figure { margin: 0; display: grid; gap: 6px; }
+.maps canvas { width: 100%; aspect-ratio: 1; border-radius: 6px; border: 1px solid var(--rule); image-rendering: pixelated; }
+.maps figcaption { display: grid; gap: 2px; font-size: var(--s-1); line-height: 1.35; }
+.maps figcaption span { color: var(--muted); }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; font-size: var(--s-1); width: 100%; }
+td, th { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+td code { overflow-wrap: anywhere; }
+td .muted { display: block; }
+th { font-weight: 700; color: var(--muted); }
+td.num { font-family: var(--f-mono); text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* how it's made */
+.prose { display: grid; gap: 12px; max-width: 72ch; }
+.made-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+@media (min-width: 760px) { .made-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.files { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.files li { display: grid; gap: 1px; }
+.files span { font-size: var(--s-1); color: var(--muted); }
+footer { max-width: 1240px; margin: 32px auto 0; font-size: var(--s-1); color: var(--muted); }
+</style>
+</head>
+<body data-mode="trace" data-unit="letter">
+<header class="mast">
+  <div class="mast-in">
+    <a class="brand" href="#practice" aria-label="WP-Ductus, practice">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2c3 5 7 10 7 15 0 3-2 5-4 6l-2 7h-2l-2-7c-2-1-4-3-4-6 0-5 4-10 7-15z" style="fill: var(--accent)"/><circle cx="16" cy="16" r="2" style="fill: var(--desk)"/><path d="M16 18v8" style="stroke: var(--desk)" stroke-width="1.2"/></svg>
+      <span>WP-Ductus</span>
+    </a>
+    <nav class="tabs" aria-label="Views">
+      <a href="#practice">Practice</a>
+      <a href="#hand">The hand</a>
+      <a href="#network">Inside the network</a>
+      <a href="#made">How it's made</a>
+    </nav>
+    <a class="btn small gh" href="https://github.com/heldernoid/WP-Ductus" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/></svg>
+      GitHub
+    </a>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="status" id="status" role="status">Loading the network and the model letters…</p>
+
+  <!-- ============================== PRACTICE ============================== -->
+  <section class="view" data-view="practice" aria-label="Practice">
+    <div class="intro">
+      <h1>Write <span class="hand-name">Copperplate</span>, <em>stroke by stroke</em></h1>
+      <p>Choose one of <span class="n-hands">ten</span> hands, then trace the dots or copy by eye, one letter or a whole page of text. A small network marks the shape, the direction and order of your strokes, the shading and the form. Its <span class="n-lines">191</span> weights were typed by hand.</p>
+    </div>
+
+    <div class="panel controls">
+      <div class="hands" id="hands" role="group" aria-label="Hand (calligraphy style)"></div>
+      <div class="variants" id="variants" role="group" aria-label="Style of this hand" hidden></div>
+      <div class="ctrl-row">
+        <div class="seg" role="group" aria-label="Game">
+          <button type="button" data-mode="trace" aria-pressed="true">Trace the dots</button>
+          <button type="button" data-mode="copy" aria-pressed="false">Copy by eye</button>
+        </div>
+        <div class="seg" role="group" aria-label="What to write">
+          <button type="button" data-unit="letter" aria-pressed="true">Letters</button>
+          <button type="button" data-unit="text" aria-pressed="false">Text</button>
+        </div>
+        <span class="star-total" id="star-total" title="Stars over the 36 small letters and digits in this game"></span>
+      </div>
+
+      <div id="letters-panel" class="text-form">
+        <div class="ptabs" id="palette-tabs" role="tablist" aria-label="Letter groups"></div>
+        <div class="keys" id="palette-keys"></div>
+        <p class="hint" id="unicase-note" hidden></p>
+        <div class="take">
+          <span>Drill sheet for this letter:</span>
+          <button class="btn small" type="button" data-template="trace">Tracing (PDF)</button>
+          <button class="btn small" type="button" data-template="copy">Copybook (PDF)</button>
+        </div>
+      </div>
+
+      <div id="text-panel" class="text-form" hidden>
+        <div class="phrases" id="phrases"></div>
+        <form id="text-form" class="text-form">
+          <label class="cap" for="text-in">Your text</label>
+          <textarea id="text-in" rows="3" maxlength="4000" spellcheck="false" autocomplete="off"
+            placeholder="Type or paste anything: a poem, a letter, your notes. Line breaks are kept; long texts become pages."></textarea>
+          <div class="row">
+            <button class="btn primary" type="submit">Write this text</button>
+            <label class="btn file">Upload a .txt file<input type="file" id="upload" accept=".txt,.md,text/plain"></label>
+            <span class="spacer"></span>
+            <span class="hint" style="display:inline">Template:</span>
+            <button class="btn small" type="button" data-template="trace">Tracing (PDF)</button>
+            <button class="btn small" type="button" data-template="copy">Copybook (PDF)</button>
+          </div>
+          <p class="hint" id="text-note"></p>
+        </form>
+      </div>
+    </div>
+
+    <div class="workspace" id="workspace">
+      <section class="notebook" aria-labelledby="h-pad">
+        <div class="nb-head">
+          <h2 id="h-pad"><span id="verb">Trace</span> <span class="t" id="title"></span></h2>
+          <div class="pager" id="pager" hidden>
+            <button type="button" id="prev-page" aria-label="Previous page">‹</button>
+            <span id="page-label"></span>
+            <button type="button" id="next-page" aria-label="Next page">›</button>
+          </div>
+          <div class="seg size-row" id="size-row" role="group" aria-label="Writing size" hidden>
+            <button type="button" id="smaller" title="Smaller writing: more letters to a row">A−</button>
+            <button type="button" id="larger" title="Larger writing: easier to follow with a pen">A+</button>
+          </div>
+          <div class="row">
+            <button class="btn small" id="pen-only" type="button" aria-pressed="false" hidden title="Only the pen writes: a palm or finger on the page is ignored">Pen only</button>
+            <button class="btn small lock" id="lock" type="button" aria-pressed="false" hidden title="Lock the page: it does not scroll or zoom, and only the pen writes (a hand resting on the screen does nothing)"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7.5" rx="1.5"/><path d="M5.2 7V5a2.8 2.8 0 0 1 5.6 0v2"/></svg><span>Lock</span></button>
+            <button class="btn small" id="focus" type="button" aria-pressed="false" title="The notebook alone, full screen (Esc to leave)">Focus</button>
+          </div>
+        </div>
+        <div class="sheets">
+          <figure class="sheet" id="model-sheet" hidden>
+            <figcaption class="cap">Model</figcaption>
+            <div class="paper"><canvas id="mv" aria-label="The model"></canvas></div>
+          </figure>
+          <figure class="sheet">
+            <figcaption class="cap">Your page</figcaption>
+            <div class="paper pad" id="pad"><canvas id="cv" aria-label="Writing area: write here with a pen, a finger or the mouse"></canvas></div>
+          </figure>
+        </div>
+        <div class="legend" id="legend" hidden>
+          <span style="--c: var(--off)">off the path</span>
+          <span style="--c: var(--miss)">missed</span>
+          <span style="--c: var(--back)">wrong direction</span>
+          <span style="--c: var(--press)" id="legend-press">wrong pressure</span>
+          <span style="--c: var(--ghost)" id="legend-ghost">the model, beside your letter</span>
+        </div>
+        <p class="hint" id="hint"></p>
+        <div class="toolbar" role="toolbar" aria-label="Writing tools">
+          <button class="btn" id="watch" type="button">Show me</button>
+          <button class="btn" id="undo" type="button">Undo</button>
+          <button class="btn" id="clear" type="button">Clear</button>
+          <span class="input-mode" id="input-mode">Write with a pen, a finger or the mouse</span>
+          <button class="btn mini-score" id="mini-score" type="button" hidden aria-label="Your score: show your marks"></button>
+          <button class="btn primary" id="check" type="button">Check my letter</button>
+        </div>
+      </section>
+
+      <aside class="marks" id="marks" aria-live="polite" aria-label="Your marks">
+        <div id="empty">
+          <h2>Your marks</h2>
+          <p class="muted" id="empty-text"></p>
+        </div>
+        <div id="report" hidden>
+          <p class="eyebrow" id="page-head"></p>
+          <div class="score"><span class="big" id="overall">0</span><span class="bigstars" id="stars"></span></div>
+          <div class="bars" id="bars"></div>
+          <p class="tip" id="tip"></p>
+          <div class="per" id="per" hidden></div>
+          <p class="hint" id="pressure-note"></p>
+          <div class="row">
+            <button class="btn" id="again" type="button">Try again</button>
+            <button class="btn primary" id="next" type="button">Next →</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="text-report" id="text-report" hidden aria-labelledby="h-tr">
+      <div class="tr-head">
+        <h2 id="h-tr">Your text, <em>all the way through</em></h2>
+        <span class="eyebrow" id="tr-progress"></span>
+      </div>
+      <div class="tr-grid">
+        <div class="card">
+          <div class="score"><span class="big" id="tr-overall">0</span><span class="bigstars" id="tr-stars"></span></div>
+          <div class="bars" id="tr-bars"></div>
+          <div class="steady" id="tr-steady" hidden></div>
+        </div>
+        <div class="card">
+          <h3>Work on these next</h3>
+          <ol class="advice" id="tr-advice"></ol>
+        </div>
+        <div class="card">
+          <h3>Your weakest letters</h3>
+          <ul class="weak" id="tr-weak"></ul>
+        </div>
+        <div class="card">
+          <h3>Where the points went</h3>
+          <p class="hint">Points lost per letter, on average, to each kind of fault.</p>
+          <div class="bars" id="tr-faults"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Word by word</h3>
+        <div class="words" id="tr-words"></div>
+      </div>
+    </section>
+  </section>
+
+  <!-- ============================== THE HAND ============================== -->
+  <section class="view" data-view="hand" hidden aria-labelledby="h-hand">
+    <div class="intro">
+      <h1 id="h-hand">The hand you are learning: <em class="hand-name">Copperplate</em></h1>
+      <p id="hand-intro"></p>
+      <p class="hint" style="display:block">Choose another hand on the Practice tab.</p>
+    </div>
+    <div class="panel">
+      <div class="row"><h2 style="flex:1">The alphabet</h2><span class="hint" style="display:inline">Tap a letter to practise it.</span></div>
+      <canvas class="specimen" id="specimen" aria-label="The alphabet of this hand on its guidelines"></canvas>
+      <p class="hint" style="display:block">Each letter is a set of pen strokes in writing order, not a font: <span class="n-letters">1600</span> characters across the hands, accented letters included.</p>
+    </div>
+    <div class="panel hand-grid">
+      <div class="facts">
+        <h2>Tools and proportions</h2>
+        <dl id="hand-facts"></dl>
+      </div>
+      <div class="facts">
+        <canvas class="anatomy" id="anatomy" aria-label="The guidelines of this hand with three of its letters"></canvas>
+        <p class="hint" id="anatomy-note"></p>
+      </div>
+    </div>
+    <div class="panel">
+      <h2 id="strokes-title">The basic strokes</h2>
+      <p class="muted" id="strokes-note"></p>
+      <div class="strokes" id="strokes"></div>
+    </div>
+    <div class="panel">
+      <h2>How to practise</h2>
+      <ul class="list">
+        <li>Go slowly. Calligraphy is drawn more than written; a long stroke takes about a second.</li>
+        <li>With a pointed pen, press only on the way down and release before the turn. With a broad nib, never turn the pen: hold it at the hand's angle and let the direction make the thick and thin.</li>
+        <li>Keep the downstrokes parallel to each other (and to the slant lines, where the hand leans); check them after each letter.</li>
+        <li>Lift the pen where the model does (the numbers show the strokes); a smooth join is better than a forced one.</li>
+        <li>Start with the dotted keys on the Practice tab: each hand marks the letters to learn first. Then the round letters, then the long ones, then capitals.</li>
+        <li>Pointed-pen hands (Copperplate, Spencerian, Modern) take their thick and thin from pressure; broad-nib hands from the direction, with the nib held at one angle all the time.</li>
+        <li>For words, copy the minim words first (<em>minimum</em>, <em>nun</em>), then a pangram, then your own texts; download a copybook and practise on paper too.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============================== INSIDE THE NETWORK ============================== -->
+  <section class="view" data-view="network" hidden aria-labelledby="h-net">
+    <div class="intro">
+      <h1 id="h-net">Inside <em>the network</em></h1>
+      <p>What the network saw in one of your letters: the maps it compared and every number behind the marks. Pick a letter in your marks on the Practice tab to see it here.</p>
+    </div>
+    <div class="panel">
+      <p class="muted" id="net-empty">Check a letter or a page on the Practice tab; the letter you pick in your report appears here.</p>
+      <div id="net" hidden class="text-form">
+        <p id="net-which"></p>
+        <div class="maps" id="maps"></div>
+        <div class="scroll"><table>
+          <thead><tr><th>Measure</th><th>Value</th><th>How the network counts it</th></tr></thead>
+          <tbody id="measures"></tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>The layers</h2>
+      <div class="scroll"><table>
+        <thead><tr><th>Layer</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code>render</code></td><td>Your strokes and the model's become the same 96 × 96 maps: ink, the pen's path, pen width, writing time, direction (down, up, left, right). Same code for both: the Siamese part.</td></tr>
+          <tr><td><code>E1, E2</code></td><td>1 × 1 convolutions with shared weights: solid ink, shaded ink (pen wider than 2.25 px), the model's hairlines.</td></tr>
+          <tr><td><code>B1, B2</code></td><td>Max over 3 × 3: the tolerance band, 2 px for tracing and 4 px for copying; direction and shade only 1 px.</td></tr>
+          <tr><td><code>C1, C2</code></td><td>Comparison maps, each an AND or AND-NOT written as <code>clip(a + b − 1)</code>: on or off the path, covered or missed, same or opposite direction, too early or too late, thick where thin.</td></tr>
+          <tr><td><code>Z, R</code></td><td>Pixel counts, then fixed ratios: stay, cover, direction, order slip, shade hit, hairline slip.</td></tr>
+          <tr><td><code>Z2, R2, S</code></td><td>Copy game: moments of the thin-pen path give its slant (slope of x on y) and size (variance of y), against the model's.</td></tr>
+          <tr><td><code>Q, F, O</code></td><td>The marks (shape, ductus, shading, form), the faults in points (the tip names the largest), and the overall score.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- ============================== HOW IT'S MADE ============================== -->
+  <section class="view" data-view="made" hidden aria-labelledby="h-made">
+    <div class="intro">
+      <h1 id="h-made">How it's <em>made</em></h1>
+      <p>A calligraphy teacher whose network was written by hand: <span class="n-lines">191</span> edit lines, each with a reason, and nothing trained.</p>
+    </div>
+    <div class="made-grid">
+      <div class="card">
+        <h3>How a letter is marked</h3>
+        <ol class="list">
+          <li>The model letter is stored as pen strokes in writing order, at the copperplate slant of 55°. Its thick and thin parts follow the pointed-pen rule: pressure only while the pen moves down along the slant.</li>
+          <li>Your strokes and the model's go through the same steps: drawn on a 96 × 96 grid as maps of ink, the pen's path, pen width, writing time and direction.</li>
+          <li>Hand-written layers widen the maps into a tolerance band and compare them pixel by pixel: your ink inside or outside the band, the model covered or missed, the same or the opposite direction, written too early or too late, thick where the model is thick.</li>
+          <li>The counts become measures, and fixed weights turn them into the marks. In the copy game your letter is first fitted onto the model (place, size and slant), so shape and ductus mark the strokes themselves; slant and size, measured before the fit, make the form mark.</li>
+          <li>Text is cut into letters at the boundaries between them (a joined stroke is split where it crosses one) and each letter is marked on its own; the report adds them up.</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>Is this a real model?</h3>
+        <div class="prose">
+          <p>In structure, yes: convolutions, pooling and linear layers, run by an engine that starts every weight at zero and fills it from a plain-text edit list. The same encoder reads your letter and the model's.</p>
+          <p>Nothing was learned. Every weight is a rule written by hand, such as "your ink here and no model ink near it means off the path". It is a scoring method written in the form of a neural network: every score can be explained, and a perfect copy always scores 100. It has not seen real handwriting; the model letters are one hand's version of copperplate.</p>
+        </div>
+      </div>
+      <div class="card">
+        <h3>How the page is designed</h3>
+        <ul class="list">
+          <li><b>Play first.</b> Practice opens on a letter ready to trace. Explanations live in their own tabs.</li>
+          <li><b>A notebook, not a form.</b> Text is laid out on ruled pages with a margin line, the way you would practise on paper; long texts turn into pages, each checked when you finish it.</li>
+          <li><b>Precision, not position.</b> In the copy game you can write anywhere on the page; the network fits your letter onto the model before it marks the strokes.</li>
+          <li><b>The eye travels sideways.</b> When copying text, the model page sits beside yours, row level with row.</li>
+          <li><b>Feedback at two sizes.</b> One tip for a letter; for a text, the report adds up hundreds of letters into a few things to work on and the letters to practise next.</li>
+          <li><b>Take it home.</b> Every text and every letter can become a printable tracing sheet or copybook.</li>
+          <li><b>Ten hands, one network.</b> The network compares any two sets of strokes, so a new hand needs only its letters, its guidelines and its pen; broad nibs are drawn as the shape their edge sweeps.</li>
+          <li><b>Measured against the sheets.</b> Each hand's letters were authored from its exemplar sheet in the sheet's stroke order: the sheet measured first (x-height in nib widths, slant, nib angle, widths), then every row set beside the letters at the same size. Never traced, and never taken from a font: a font has no stroke order.</li>
+          <li><b>Built for a pen.</b> The first stylus stroke ignores the palm, the tools stay in reach at the bottom, Focus gives the notebook the whole screen, and Lock holds the page still under your hand.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Files and the log</h3>
+        <ul class="files">
+          <li><a href="https://github.com/heldernoid/WP-Ductus/blob/main/README.md" target="_blank" rel="noopener">README.md</a><span>What it is, the distortion tables, how to run it.</span></li>
+          <li><a href="https://github.com/heldernoid/WP-Ductus/blob/main/LOG.md" target="_blank" rel="noopener">LOG.md</a><span>How the weights were written: every decision, the numbers before and after, and what did not work.</span></li>
+          <li><a href="https://github.com/heldernoid/WP-Ductus/blob/main/AGENTS.md" target="_blank" rel="noopener">AGENTS.md</a><span>House rules and how to add a letter or a style.</span></li>
+          <li><a href="https://github.com/heldernoid/WP-Ductus/blob/main/weights/ductus.edits" target="_blank" rel="noopener">weights/ductus.edits</a><span>The network itself, one edit per line.</span></li>
+        </ul>
+        <p class="hint">Weights, model letters and code written by Claude Opus 5.5 (Anthropic) with the project's author. Sister project: <a href="https://github.com/heldernoid/WP-CharNet" target="_blank" rel="noopener">WP-CharNet</a>. MIT licence.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<footer><p>WP-Ductus · calligraphy practice with a hand-written network · <span class="n-hands">10</span> hands, <span class="n-letters">1600</span> model letters</p></footer>
+<script type="module" src="app.js"></script>
+</body>
+</html>

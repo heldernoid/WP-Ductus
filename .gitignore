@@ -1,0 +1,18 @@
+# local environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
+
+# assistant / agent instruction
+CLAUDE.md
+CLAUDE.local.md
+.claude/
+.cursor/
+.cursorrules
+.aider*
+.github/copilot-instructions.md
+
+# local renders and scratch output
+results/

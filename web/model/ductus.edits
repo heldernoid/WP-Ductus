@@ -1,0 +1,216 @@
+# WP-Ductus weights: every nonzero parameter comes from a line below; nothing was trained or fitted.
+
+# ---- E1 encoder (same weights for the model and the attempt) ---------------------------------------------
+TAP E1 m_on m_ink 0 0 3
+BIAS E1 m_on -1   # solid ink: 1 from two-thirds coverage up (the anti-aliased fringe does not count)
+TAP E1 m_shade m_wid 0 0 0.8
+BIAS E1 m_shade -1.8   # shaded ink: pen wider than 2.25 px counts, 3.5 px and wider fully (hairline 1.3, full shade 4)
+TAP E1 a_on a_ink 0 0 3
+BIAS E1 a_on -1   # solid ink: 1 from two-thirds coverage up (the anti-aliased fringe does not count)
+TAP E1 a_shade a_wid 0 0 0.8
+BIAS E1 a_shade -1.8   # shaded ink: pen wider than 2.25 px counts, 3.5 px and wider fully (hairline 1.3, full shade 4)
+
+# ---- E2 hairline ink of the model; 1 - writing time on the model's ink (to carry the earliest time nearby) 
+TAP E2 m_hair m_on 0 0 1
+TAP E2 m_hair m_shade 0 0 -1
+BIAS E2 m_hair 0   # model ink that is not shaded
+TAP E2 m_tinv m_on 0 0 1
+TAP E2 m_tinv m_t 0 0 -1
+BIAS E2 m_tinv 0   # 1 - t on the model's ink, 0 elsewhere: widened by max, it gives 1 - the EARLIEST time nearby
+
+# ---- B1-B2 tolerance band: widen by 1 px (B1), then `widen` more times (B2; 2 px tracing, 4 px copying); the model's direction and shaded ink by 1 px only (wider, a stem's neighbouring upstroke leaks into its direction, and the hairlines next to it vanish from the hairline check) 
+
+# ---- C1 comparison maps (AND of two maps = clip(a + b - 1)) ----------------------------------------------
+TAP C1 on_track a_on 0 0 1
+TAP C1 on_track m_on_b 0 0 1
+BIAS C1 on_track -1   # your ink inside the model's band
+TAP C1 off_track a_on 0 0 1
+TAP C1 off_track m_on_b 0 0 -1
+BIAS C1 off_track 0   # your ink outside the model's band
+TAP C1 covered m_on 0 0 1
+TAP C1 covered a_on_b 0 0 1
+BIAS C1 covered -1   # model ink with your ink near it
+TAP C1 missed m_on 0 0 1
+TAP C1 missed a_on_b 0 0 -1
+BIAS C1 missed 0   # model ink with none of yours near it
+TAP C1 same_dn a_dn 0 0 1
+TAP C1 same_dn m_dn_n 0 0 1
+BIAS C1 same_dn -1   # you move dn where the model moves dn
+TAP C1 opp_dn a_dn 0 0 1
+TAP C1 opp_dn m_up_n 0 0 1
+TAP C1 opp_dn m_dn_n 0 0 -1
+BIAS C1 opp_dn -1   # you move dn where the model only moves up: the stroke runs backwards
+TAP C1 same_up a_up 0 0 1
+TAP C1 same_up m_up_n 0 0 1
+BIAS C1 same_up -1   # you move up where the model moves up
+TAP C1 opp_up a_up 0 0 1
+TAP C1 opp_up m_dn_n 0 0 1
+TAP C1 opp_up m_up_n 0 0 -1
+BIAS C1 opp_up -1   # you move up where the model only moves dn: the stroke runs backwards
+TAP C1 same_lf a_lf 0 0 1
+TAP C1 same_lf m_lf_n 0 0 1
+BIAS C1 same_lf -1   # you move lf where the model moves lf
+TAP C1 opp_lf a_lf 0 0 1
+TAP C1 opp_lf m_rt_n 0 0 1
+TAP C1 opp_lf m_lf_n 0 0 -1
+BIAS C1 opp_lf -1   # you move lf where the model only moves rt: the stroke runs backwards
+TAP C1 same_rt a_rt 0 0 1
+TAP C1 same_rt m_rt_n 0 0 1
+BIAS C1 same_rt -1   # you move rt where the model moves rt
+TAP C1 opp_rt a_rt 0 0 1
+TAP C1 opp_rt m_lf_n 0 0 1
+TAP C1 opp_rt m_rt_n 0 0 -1
+BIAS C1 opp_rt -1   # you move rt where the model only moves lf: the stroke runs backwards
+TAP C1 shade_hit m_shade 0 0 1
+TAP C1 shade_hit a_shade_b 0 0 1
+BIAS C1 shade_hit -1   # the model is shaded here and so are you
+TAP C1 shade_miss m_shade 0 0 1
+TAP C1 shade_miss a_shade_b 0 0 -1
+TAP C1 shade_miss a_on_b 0 0 1
+BIAS C1 shade_miss -1   # the model is shaded here, you wrote a thin line
+TAP C1 hair_cov m_hair 0 0 1
+TAP C1 hair_cov m_shade_n 0 0 -1
+TAP C1 hair_cov a_on_b 0 0 1
+BIAS C1 hair_cov -1   # a model hairline (not touching a shaded stroke) that you covered
+TAP C1 hair_thick m_hair 0 0 1
+TAP C1 hair_thick m_shade_n 0 0 -1
+TAP C1 hair_thick a_shade 0 0 1
+BIAS C1 hair_thick -1   # a model hairline (not touching a shaded stroke) that you wrote thick: right beside a stem, a slightly shifted stem is not a thick hairline
+
+# ---- C2 stroke order on shared ink: written much later / earlier than the model (time is 0 to 1 over the letter) 
+TAP C2 late a_t 0 0 4
+TAP C2 late m_t_b 0 0 -4
+TAP C2 late on_track 0 0 4
+BIAS C2 late -5   # your ink is a quarter of the letter or more later than the latest model ink near it; only on your ink inside the band
+TAP C2 early a_t 0 0 -4
+TAP C2 early m_tinv_b 0 0 -4
+TAP C2 early on_track 0 0 4
+BIAS C2 early -1   # your ink is a quarter of the letter or more earlier than the earliest model ink near it (4 (1 - tinv) - 4 t - 1 + 4 (on_track - 1))
+
+# ---- Z counts over the whole canvas ----------------------------------------------------------------------
+ZONE Z n_on on_track 0:96 0:96 1
+BIAS Z n_on 0   # how many pixels: on_track
+ZONE Z n_off off_track 0:96 0:96 1
+BIAS Z n_off 0   # how many pixels: off_track
+ZONE Z n_cov covered 0:96 0:96 1
+BIAS Z n_cov 0   # how many pixels: covered
+ZONE Z n_miss missed 0:96 0:96 1
+BIAS Z n_miss 0   # how many pixels: missed
+ZONE Z n_same same_dn 0:96 0:96 1
+ZONE Z n_same same_up 0:96 0:96 1
+ZONE Z n_same same_lf 0:96 0:96 1
+ZONE Z n_same same_rt 0:96 0:96 1
+BIAS Z n_same 0   # how many pixels: same_dn, same_up, same_lf, same_rt
+ZONE Z n_opp opp_dn 0:96 0:96 1
+ZONE Z n_opp opp_up 0:96 0:96 1
+ZONE Z n_opp opp_lf 0:96 0:96 1
+ZONE Z n_opp opp_rt 0:96 0:96 1
+BIAS Z n_opp 0   # how many pixels: opp_dn, opp_up, opp_lf, opp_rt
+ZONE Z n_late late 0:96 0:96 1
+BIAS Z n_late 0   # how many pixels: late
+ZONE Z n_early early 0:96 0:96 1
+BIAS Z n_early 0   # how many pixels: early
+ZONE Z n_shade_hit shade_hit 0:96 0:96 1
+BIAS Z n_shade_hit 0   # how many pixels: shade_hit
+ZONE Z n_shade_miss shade_miss 0:96 0:96 1
+BIAS Z n_shade_miss 0   # how many pixels: shade_miss
+ZONE Z n_hair_cov hair_cov 0:96 0:96 1
+BIAS Z n_hair_cov 0   # how many pixels: hair_cov
+ZONE Z n_hair_thick hair_thick 0:96 0:96 1
+BIAS Z n_hair_thick 0   # how many pixels: hair_thick
+
+# ---- Q quality scores from the ratios (R: stay, cover, direction, order_slip, shade_hit, hair_slip) ------
+LINK Q shape stay 1
+LINK Q shape cover 1
+BIAS Q shape -1   # shape = 1 when you stay on the model and cover all of it; 0.9 of each gives 0.8, 0.8 gives 0.6, half gives 0
+LINK Q ductus direction 1.5
+LINK Q ductus order_slip -1.5
+BIAS Q ductus -0.5   # ductus = 1 when every stroke runs the model's way in the model's order; a third backwards gives 0.5; order slips cost as much
+LINK Q shading shade_hit 0.7
+LINK Q shading hair_slip -0.7
+BIAS Q shading 0.3   # shading = 1 when every shaded part is thick and every hairline thin
+
+# ---- O overall, with and without pressure (a mouse or a finger has none: shading is not judged) ----------
+LINK O overall_pressure shape 0.5
+LINK O overall_pressure ductus 0.3
+LINK O overall_pressure shading 0.2
+BIAS O overall_pressure 0   # half shape, 30% ductus, 20% shading
+LINK O overall_no_pressure shape 0.6
+LINK O overall_no_pressure ductus 0.4
+BIAS O overall_no_pressure 0   # 60% shape, 40% ductus
+
+# ---- Z2 sums for slant and size (copy mode), on the thin-pen path so that pressure does not move them; R2 turns them into mean y, variance of y and slope of x on y (fixed op) 
+ZONE Z2 a_n a_form 0:96 0:96 1
+BIAS Z2 a_n 0   # amount of path over your (where it lies on the fitted model) path
+ZONE Z2 a_sx a_form 0:96 0:96 x
+BIAS Z2 a_sx 0   # sum of x over your (where it lies on the fitted model) path
+ZONE Z2 a_sy a_form 0:96 0:96 y
+BIAS Z2 a_sy 0   # sum of y over your (where it lies on the fitted model) path
+ZONE Z2 a_sxy a_form 0:96 0:96 xy
+BIAS Z2 a_sxy 0   # sum of x * y over your (where it lies on the fitted model) path
+ZONE Z2 a_syy a_form 0:96 0:96 yy
+BIAS Z2 a_syy 0   # sum of y * y over your (where it lies on the fitted model) path
+ZONE Z2 m_n m_form 0:96 0:96 1
+BIAS Z2 m_n 0   # amount of path over the model's (where your path covers it) path
+ZONE Z2 m_sx m_form 0:96 0:96 x
+BIAS Z2 m_sx 0   # sum of x over the model's (where your path covers it) path
+ZONE Z2 m_sy m_form 0:96 0:96 y
+BIAS Z2 m_sy 0   # sum of y over the model's (where your path covers it) path
+ZONE Z2 m_sxy m_form 0:96 0:96 xy
+BIAS Z2 m_sxy 0   # sum of x * y over the model's (where your path covers it) path
+ZONE Z2 m_syy m_form 0:96 0:96 yy
+BIAS Z2 m_syy 0   # sum of y * y over the model's (where your path covers it) path
+
+# ---- S lean gap: your slope minus the model's (x per px down; copperplate leans right going up, so about -0.7) 
+LINK S lean_gap a_slope 1
+LINK S lean_gap m_slope -1
+BIAS S lean_gap 0   # positive: you lean less than the model (more upright); negative: more
+
+# ---- F faults: how many score points each fault costs (its quality's slope); the page's tip is the largest one 
+LINK F f_off stay -1
+BIAS F f_off 1   # ink off the model: 1 - stay (shape slope 1)
+LINK F f_miss cover -1
+BIAS F f_miss 1   # model not covered: 1 - cover (shape slope 1)
+LINK F f_back direction -1.5
+LINK F f_back cover 1
+BIAS F f_back 0.5   # strokes written backwards: 1.5 (1 - direction) (ductus slope 1.5), less 1 - cover below: with little of the letter written, direction means little and the tip should say so
+LINK F f_order order_slip 1.5
+BIAS F f_order 0   # strokes in the wrong order: 1.5 order_slip (ductus slope 1.5)
+LINK F f_thin shade_hit -0.7
+LINK F f_thin has_pressure 1
+BIAS F f_thin -0.3   # downstrokes not pressed: 0.7 (1 - shade_hit), only with pressure (without it the sum is below 0)
+LINK F f_thick hair_slip 0.7
+LINK F f_thick has_pressure 1
+BIAS F f_thick -1   # hairlines pressed: 0.7 hair_slip, only with pressure
+LINK F f_upright lean_gap 2.5
+LINK F f_upright copy 1
+LINK F f_upright cover 2
+BIAS F f_upright -3.25   # too upright: lean_gap is how much less x moves per px of height than in the model; 0.1 (about 4 degrees) free, each 0.1 more costs a quarter; copy mode only; and silenced by 2 x the share of the model you missed (-2 here, + 2 cover): a letter with a part missing has no slant or size of its own
+LINK F f_slanted lean_gap -2.5
+LINK F f_slanted copy 1
+LINK F f_slanted cover 2
+BIAS F f_slanted -3.25   # too slanted: the same, the other way (and the same 2 x cover)
+LINK F f_big size2 1.33333
+LINK F f_big copy 1
+LINK F f_big cover 2
+BIAS F f_big -4.61333   # too big: size2 is your height variance over the model's (size squared); 1.1 times the size (1.21) free, 1.4 times (1.96) = 1 (and the same 2 x cover)
+LINK F f_small size2 -2.22222
+LINK F f_small copy 1
+LINK F f_small cover 2
+BIAS F f_small -1.2   # too small: 0.9 times the size (0.81) free, 0.6 times (0.36) = 1 (and the same 2 x cover)
+
+# ---- Q2 form (copy mode): slant and size; O2 the copy-mode overall ---------------------------------------
+LINK Q2 form f_upright -1
+LINK Q2 form f_slanted -1
+LINK Q2 form f_big -1
+LINK Q2 form f_small -1
+BIAS Q2 form 1   # form = 1 minus the slant and size faults
+LINK O2 overall_copy_pressure shape 0.4
+LINK O2 overall_copy_pressure ductus 0.3
+LINK O2 overall_copy_pressure shading 0.15
+LINK O2 overall_copy_pressure form 0.15
+BIAS O2 overall_copy_pressure 0   # 40% shape, 30% ductus, 15% shading, 15% form
+LINK O2 overall_copy_no_pressure shape 0.45
+LINK O2 overall_copy_no_pressure ductus 0.35
+LINK O2 overall_copy_no_pressure form 0.2
+BIAS O2 overall_copy_no_pressure 0   # 45% shape, 35% ductus, 20% form

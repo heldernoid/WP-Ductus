@@ -1,0 +1,431 @@
+{
+ "name": "WP-Ductus",
+ "input": [
+  96,
+  96
+ ],
+ "layers": [
+  {
+   "id": "E1",
+   "op": "conv",
+   "k": 1,
+   "act": "clip01",
+   "in": [
+    "m_ink",
+    "m_wid",
+    "a_ink",
+    "a_wid"
+   ],
+   "out": [
+    "m_on",
+    "a_on",
+    "m_shade",
+    "a_shade"
+   ]
+  },
+  {
+   "id": "E2",
+   "op": "conv",
+   "k": 1,
+   "act": "clip01",
+   "in": [
+    "m_on",
+    "m_shade",
+    "m_t"
+   ],
+   "out": [
+    "m_hair",
+    "m_tinv"
+   ]
+  },
+  {
+   "id": "B1",
+   "op": "max3",
+   "in": [
+    "m_on",
+    "a_on",
+    "a_shade",
+    "m_t",
+    "m_tinv",
+    "m_dn",
+    "m_up",
+    "m_lf",
+    "m_rt",
+    "m_shade"
+   ],
+   "out": [
+    "m_on_b",
+    "a_on_b",
+    "a_shade_b",
+    "m_t_b",
+    "m_tinv_b",
+    "m_dn_n",
+    "m_up_n",
+    "m_lf_n",
+    "m_rt_n",
+    "m_shade_n"
+   ]
+  },
+  {
+   "id": "B2",
+   "op": "loop",
+   "n_from": "widen",
+   "body": [
+    {
+     "id": "B2a",
+     "op": "max3",
+     "in": [
+      "m_on_b",
+      "a_on_b",
+      "a_shade_b",
+      "m_t_b",
+      "m_tinv_b"
+     ],
+     "out": [
+      "m_on_b",
+      "a_on_b",
+      "a_shade_b",
+      "m_t_b",
+      "m_tinv_b"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "C1",
+   "op": "conv",
+   "k": 1,
+   "act": "clip01",
+   "in": [
+    "a_on",
+    "m_on_b",
+    "m_on",
+    "a_on_b",
+    "m_shade",
+    "m_shade_n",
+    "m_hair",
+    "a_shade",
+    "a_shade_b",
+    "a_dn",
+    "a_up",
+    "a_lf",
+    "a_rt",
+    "m_dn_n",
+    "m_up_n",
+    "m_lf_n",
+    "m_rt_n"
+   ],
+   "out": [
+    "on_track",
+    "off_track",
+    "covered",
+    "missed",
+    "same_dn",
+    "same_up",
+    "same_lf",
+    "same_rt",
+    "opp_dn",
+    "opp_up",
+    "opp_lf",
+    "opp_rt",
+    "shade_hit",
+    "shade_miss",
+    "hair_cov",
+    "hair_thick"
+   ]
+  },
+  {
+   "id": "C2",
+   "op": "conv",
+   "k": 1,
+   "act": "clip01",
+   "in": [
+    "a_t",
+    "m_t_b",
+    "m_tinv_b",
+    "on_track"
+   ],
+   "out": [
+    "late",
+    "early"
+   ]
+  },
+  {
+   "id": "Z",
+   "op": "zone",
+   "act": "none",
+   "in": [
+    "on_track",
+    "off_track",
+    "covered",
+    "missed",
+    "same_dn",
+    "same_up",
+    "same_lf",
+    "same_rt",
+    "opp_dn",
+    "opp_up",
+    "opp_lf",
+    "opp_rt",
+    "shade_hit",
+    "shade_miss",
+    "hair_cov",
+    "hair_thick",
+    "late",
+    "early"
+   ],
+   "out": [
+    "n_on",
+    "n_off",
+    "n_cov",
+    "n_miss",
+    "n_same",
+    "n_opp",
+    "n_late",
+    "n_early",
+    "n_shade_hit",
+    "n_shade_miss",
+    "n_hair_cov",
+    "n_hair_thick"
+   ]
+  },
+  {
+   "id": "R",
+   "op": "ratio",
+   "parts": {
+    "stay": [
+     [
+      "n_on"
+     ],
+     [
+      "n_on",
+      "n_off"
+     ]
+    ],
+    "cover": [
+     [
+      "n_cov"
+     ],
+     [
+      "n_cov",
+      "n_miss"
+     ]
+    ],
+    "direction": [
+     [
+      "n_same"
+     ],
+     [
+      "n_same",
+      "n_opp"
+     ]
+    ],
+    "order_slip": [
+     [
+      "n_late",
+      "n_early"
+     ],
+     [
+      "n_on"
+     ]
+    ],
+    "shade_hit": [
+     [
+      "n_shade_hit"
+     ],
+     [
+      "n_shade_hit",
+      "n_shade_miss"
+     ],
+     1.0
+    ],
+    "hair_slip": [
+     [
+      "n_hair_thick"
+     ],
+     [
+      "n_hair_cov"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "Z2",
+   "op": "zone",
+   "act": "none",
+   "in": [
+    "a_form",
+    "m_form"
+   ],
+   "out": [
+    "a_n",
+    "a_sx",
+    "a_sy",
+    "a_sxy",
+    "a_syy",
+    "m_n",
+    "m_sx",
+    "m_sy",
+    "m_sxy",
+    "m_syy"
+   ]
+  },
+  {
+   "id": "R2",
+   "op": "moments",
+   "parts": {
+    "a": [
+     "a_n",
+     "a_sx",
+     "a_sy",
+     "a_sxy",
+     "a_syy"
+    ],
+    "m": [
+     "m_n",
+     "m_sx",
+     "m_sy",
+     "m_sxy",
+     "m_syy"
+    ]
+   }
+  },
+  {
+   "id": "R3",
+   "op": "ratio",
+   "parts": {
+    "size2": [
+     [
+      "a_vy"
+     ],
+     [
+      "m_vy"
+     ]
+    ]
+   }
+  },
+  {
+   "id": "S",
+   "op": "linear",
+   "act": "none",
+   "in": [
+    "a_slope",
+    "m_slope"
+   ],
+   "out": [
+    "lean_gap"
+   ]
+  },
+  {
+   "id": "Q",
+   "op": "linear",
+   "act": "clip01",
+   "in": [
+    "stay",
+    "cover",
+    "direction",
+    "order_slip",
+    "shade_hit",
+    "hair_slip"
+   ],
+   "out": [
+    "shape",
+    "ductus",
+    "shading"
+   ]
+  },
+  {
+   "id": "O",
+   "op": "linear",
+   "act": "clip01",
+   "in": [
+    "shape",
+    "ductus",
+    "shading"
+   ],
+   "out": [
+    "overall_pressure",
+    "overall_no_pressure"
+   ]
+  },
+  {
+   "id": "F",
+   "op": "linear",
+   "act": "clip01",
+   "in": [
+    "stay",
+    "cover",
+    "direction",
+    "order_slip",
+    "shade_hit",
+    "hair_slip",
+    "has_pressure",
+    "copy",
+    "lean_gap",
+    "size2"
+   ],
+   "out": [
+    "f_off",
+    "f_miss",
+    "f_back",
+    "f_order",
+    "f_thin",
+    "f_thick",
+    "f_upright",
+    "f_slanted",
+    "f_big",
+    "f_small"
+   ]
+  },
+  {
+   "id": "Q2",
+   "op": "linear",
+   "act": "clip01",
+   "in": [
+    "f_upright",
+    "f_slanted",
+    "f_big",
+    "f_small"
+   ],
+   "out": [
+    "form"
+   ]
+  },
+  {
+   "id": "O2",
+   "op": "linear",
+   "act": "clip01",
+   "in": [
+    "shape",
+    "ductus",
+    "shading",
+    "form"
+   ],
+   "out": [
+    "overall_copy_pressure",
+    "overall_copy_no_pressure"
+   ]
+  }
+ ],
+ "inputs": [
+  "m_ink",
+  "m_path",
+  "m_wid",
+  "m_t",
+  "m_dn",
+  "m_up",
+  "m_lf",
+  "m_rt",
+  "a_ink",
+  "a_path",
+  "a_wid",
+  "a_t",
+  "a_dn",
+  "a_up",
+  "a_lf",
+  "a_rt",
+  "has_pressure",
+  "copy",
+  "widen"
+ ]
+}
